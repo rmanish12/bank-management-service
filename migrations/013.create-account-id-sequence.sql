@@ -1,0 +1,1 @@
+CREATE SEQUENCE IF NOT EXISTS account_id_seq AS integer START 10000000;
