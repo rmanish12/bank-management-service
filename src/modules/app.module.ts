@@ -9,6 +9,7 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { RoleModule } from './role.module';
 import { PermissionModule } from './permission.module';
 import { PermissionGaurd } from 'src/gaurds/permission.gaurd';
+import { AccountTypeModule } from './account-type.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { PermissionGaurd } from 'src/gaurds/permission.gaurd';
     UserModule,
     RoleModule,
     PermissionModule,
+    AccountTypeModule,
   ],
   controllers: [],
   providers: [
@@ -34,10 +36,6 @@ import { PermissionGaurd } from 'src/gaurds/permission.gaurd';
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
     },
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: PermissionGaurd,
-    // },
   ],
 })
 export class AppModule {}

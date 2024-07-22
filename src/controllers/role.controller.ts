@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/co
 import { ApiTags } from '@nestjs/swagger';
 import { RequirePermissions } from 'src/decorators/permission.decorator';
 import { User } from 'src/decorators/user.decorator';
-import { CreateRoleDto } from 'src/dtos/create-role-dto';
+import { CreateRoleDto } from 'src/dtos/request/create-role-dto';
 import { PermissionGaurd } from 'src/gaurds/permission.gaurd';
 import { RoleService } from 'src/services/role.service';
 import { PERMISSIONS } from 'src/utils/permissions.enum';

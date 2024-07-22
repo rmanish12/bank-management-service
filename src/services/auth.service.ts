@@ -9,19 +9,19 @@ import {
 } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateUserDto } from 'src/dtos/create-user.dto';
+import { CreateUserDto } from 'src/dtos/request/create-user.dto';
 import { User } from 'src/entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { UserService } from './user.service';
 import { isEmpty, isEqual } from 'lodash';
 import { EncryptionUtil } from 'src/utils/encryption.helper';
 import { ConfigService } from '@nestjs/config';
-import { LoginUserDto } from 'src/dtos/login-user.dto';
+import { LoginUserDto } from 'src/dtos/request/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Cache } from 'cache-manager';
-import { ChangePasswordDto } from 'src/dtos/change-password.dto';
+import { ChangePasswordDto } from 'src/dtos/request/change-password.dto';
 import { RoleService } from './role.service';
-import { UpdateUserDto } from 'src/dtos/update-user-dto';
+import { UpdateUserDto } from 'src/dtos/request/update-user-dto';
 import { MapperUtils } from 'src/utils/mapper';
 
 @Injectable()

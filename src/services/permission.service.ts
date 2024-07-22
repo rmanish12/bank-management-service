@@ -1,12 +1,12 @@
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreatePermissionDto } from 'src/dtos/create-permission.dto';
+import { CreatePermissionDto } from 'src/dtos/request/create-permission.dto';
 import { Permission } from 'src/entities/permission.entity';
 import { In, Repository } from 'typeorm';
 import { UserService } from './user.service';
 import { isEmpty } from 'lodash';
 import { MapperUtils } from 'src/utils/mapper';
-import { UpdatePermissionDto } from 'src/dtos/update-permission-dto';
+import { UpdatePermissionDto } from 'src/dtos/request/update-permission-dto';
 import { User } from 'src/entities/user.entity';
 
 @Injectable()

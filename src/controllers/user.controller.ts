@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Put } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/decorators/user.decorator';
-import { CreateUserDetailsDto } from 'src/dtos/create-user-details.dto';
+import { CreateUserDetailsDto } from 'src/dtos/request/create-user-details.dto';
 import { UserService } from 'src/services/user.service';
 import { getSuccessResponse } from 'src/utils/success-response.helper';
 

@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/decorators/user.decorator';
-import { CreatePermissionDto } from 'src/dtos/create-permission.dto';
-import { UpdatePermissionDto } from 'src/dtos/update-permission-dto';
+import { CreatePermissionDto } from 'src/dtos/request/create-permission.dto';
+import { UpdatePermissionDto } from 'src/dtos/request/update-permission-dto';
 import { PermissionService } from 'src/services/permission.service';
 import { getSuccessResponse } from 'src/utils/success-response.helper';
 

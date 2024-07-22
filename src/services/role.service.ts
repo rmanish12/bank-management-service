@@ -1,12 +1,12 @@
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateRoleDto } from 'src/dtos/create-role-dto';
+import { CreateRoleDto } from 'src/dtos/request/create-role-dto';
 import { Role } from 'src/entities/role.entity';
 import { In, Repository } from 'typeorm';
 import { User } from 'src/entities/user.entity';
 import { UserService } from './user.service';
 import { isEmpty } from 'lodash';
-import { UpdateRoleDto } from 'src/dtos/update-role-dto';
+import { UpdateRoleDto } from 'src/dtos/request/update-role-dto';
 import { MapperUtils } from 'src/utils/mapper';
 import { PermissionService } from './permission.service';
 

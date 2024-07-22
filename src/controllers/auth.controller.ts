@@ -2,9 +2,9 @@ import { Body, ClassSerializerInterceptor, Controller, Get, Param, Patch, Post, 
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/public.decorator';
 import { User } from 'src/decorators/user.decorator';
-import { ChangePasswordDto } from 'src/dtos/change-password.dto';
-import { CreateUserDto } from 'src/dtos/create-user.dto';
-import { LoginUserDto } from 'src/dtos/login-user.dto';
+import { ChangePasswordDto } from 'src/dtos/request/change-password.dto';
+import { CreateUserDto } from 'src/dtos/request/create-user.dto';
+import { LoginUserDto } from 'src/dtos/request/login-user.dto';
 import { AuthService } from 'src/services/auth.service';
 import { getSuccessResponse } from 'src/utils/success-response.helper';
 

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateUserDetailsDto } from 'src/dtos/create-user-details.dto';
+import { CreateUserDetailsDto } from 'src/dtos/request/create-user-details.dto';
 import { UserDetails } from 'src/entities/user-details.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/entities/user.entity';
