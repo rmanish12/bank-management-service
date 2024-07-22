@@ -2,12 +2,12 @@ import { ConflictException, Injectable, Logger, NotFoundException } from '@nestj
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreatePermissionDto } from 'src/dtos/create-permission.dto';
 import { Permission } from 'src/entities/permission.entity';
-import { User } from 'src/entities/user.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { UserService } from './user.service';
 import { isEmpty } from 'lodash';
 import { MapperUtils } from 'src/utils/mapper';
 import { UpdatePermissionDto } from 'src/dtos/update-permission-dto';
+import { User } from 'src/entities/user.entity';
 
 @Injectable()
 export class PermissionService {
@@ -93,5 +93,24 @@ export class PermissionService {
     await this.permissionRepo.save(permissionDetails);
 
     this.logger.log(`Updated permission with id ${permissionId}`);
+  }
+
+  async getPermissionsListByIds(permissionIds: string[]): Promise<Permission[]> {
+    return this.permissionRepo.findBy({ id: In(permissionIds) });
+  }
+
+  async getAllPermissions(): Promise<Permission[]> {
+    this.logger.log('Received request for fetching all permissions');
+
+    const permissions = await this.permissionRepo.find({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    this.logger.log('Returning all the permissions details');
+
+    return permissions;
   }
 }

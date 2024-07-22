@@ -2,12 +2,13 @@ import { ConflictException, Injectable, Logger, NotFoundException } from '@nestj
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateRoleDto } from 'src/dtos/create-role-dto';
 import { Role } from 'src/entities/role.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { User } from 'src/entities/user.entity';
 import { UserService } from './user.service';
 import { isEmpty } from 'lodash';
 import { UpdateRoleDto } from 'src/dtos/update-role-dto';
 import { MapperUtils } from 'src/utils/mapper';
+import { PermissionService } from './permission.service';
 
 @Injectable()
 export class RoleService {
@@ -17,14 +18,23 @@ export class RoleService {
   constructor(
     @InjectRepository(Role) private roleRepo: Repository<Role>,
     private readonly userService: UserService,
+    private readonly permissionService: PermissionService,
   ) {}
 
   private checkRoleExistsByName(name: string) {
     return this.roleRepo.existsBy({ name });
   }
 
+  private getPermissionsDetails(permissionIds) {
+    if (isEmpty(permissionIds)) {
+      return [];
+    }
+
+    return this.permissionService.getPermissionsListByIds(permissionIds);
+  }
+
   async createRole(user: User, createRoleDto: CreateRoleDto) {
-    const { name, description } = createRoleDto;
+    const { name, description, permissions } = createRoleDto;
 
     this.logger.log(`Received request for creating role with name: ${name}`);
 
@@ -32,11 +42,14 @@ export class RoleService {
       throw new ConflictException('Role with given name already exists');
     }
 
+    const permissionDetails = await this.getPermissionsDetails(permissions);
+
     const newRole = this.roleRepo.create({
       name,
       description,
       createdBy: user,
       modifiedBy: user,
+      permissions: permissionDetails,
     });
 
     await this.roleRepo.save(newRole);
@@ -46,10 +59,22 @@ export class RoleService {
 
   private async getRoleDetailsById(roleId: string): Promise<Role> {
     const roleDetails = await this.roleRepo.findOne({
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        createdAt: true,
+        modifiedAt: true,
+        permissions: {
+          id: true,
+          name: true,
+        },
+      },
       where: { id: roleId },
       relations: {
         createdBy: true,
         modifiedBy: true,
+        permissions: true,
       },
     });
 
@@ -86,11 +111,33 @@ export class RoleService {
 
     const roleDetails = await this.getRoleDetailsById(roleId);
 
-    roleDetails.description = updateRoleDto.description;
+    const { description, permissions } = updateRoleDto;
+
+    const permissionDetails = await this.permissionService.getPermissionsListByIds(permissions);
+    roleDetails.description = description;
     roleDetails.modifiedBy = user;
+    roleDetails.permissions = permissionDetails;
 
     await this.roleRepo.save(roleDetails);
 
     this.logger.log(`Details updated for role with id: ${roleId}`);
+  }
+
+  getRoleListByIds(roleIds: string[]): Promise<Role[]> {
+    return this.roleRepo.findBy({ id: In(roleIds) });
+  }
+
+  async getAllRoles(): Promise<Role[]> {
+    this.logger.log(`Received request for fetching all roles`);
+
+    const roles = await this.roleRepo.find({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    this.logger.log(`Returning all roles details`);
+    return roles;
   }
 }

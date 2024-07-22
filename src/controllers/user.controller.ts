@@ -21,4 +21,9 @@ export class UserController {
 
     return getSuccessResponse('User profile has been updated successfully');
   }
+
+  @Get('/permissions')
+  getUserPermissions(@User() user) {
+    return this.userService.getUserPermissions(user);
+  }
 }

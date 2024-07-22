@@ -1,15 +1,16 @@
-import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDetailsDto } from 'src/dtos/create-user-details.dto';
 import { UserDetails } from 'src/entities/user-details.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/entities/user.entity';
-import { isEmpty } from 'lodash';
+import { MapperUtils } from 'src/utils/mapper';
 
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
+  private readonly mapperUtils = new MapperUtils();
 
   constructor(@InjectRepository(UserDetails) private userDetailsRepo: Repository<UserDetails>) {}
 
@@ -58,12 +59,15 @@ export class UserService {
 
   async updateUserProfile(user: User, updateUserDto: CreateUserDetailsDto) {
     this.logger.log(`Updating profile for user with id: ${user.id}`);
-    const loggedInUserDetails = await this.getUserProfile(user);
+    let loggedInUserDetails = await this.getUserProfile(user);
 
-    const newUserDetails = this.createUserDetails(updateUserDto, user);
-    newUserDetails.id = loggedInUserDetails.id;
+    loggedInUserDetails = {
+      ...loggedInUserDetails,
+      ...updateUserDto,
+    };
 
-    return this.userDetailsRepo.upsert(newUserDetails, ['email']);
+    await this.userDetailsRepo.save(loggedInUserDetails);
+    this.logger.log(`Updated profile for user with id: ${user.id}`);
   }
 
   getUserDetailsByUserId(userId: string) {
@@ -74,5 +78,37 @@ export class UserService {
         },
       },
     });
+  }
+
+  async getUserPermissions(user: User) {
+    const userWithPermissions = await this.userDetailsRepo.findOne({
+      select: {
+        id: true,
+        user: {
+          id: true,
+          roles: {
+            id: true,
+            permissions: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
+      where: {
+        user: {
+          id: user.id,
+        },
+      },
+      relations: {
+        user: {
+          roles: {
+            permissions: true,
+          },
+        },
+      },
+    });
+
+    return this.mapperUtils.mapUserDetailsForPermissions(userWithPermissions);
   }
 }

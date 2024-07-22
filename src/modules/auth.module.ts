@@ -10,9 +10,10 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from 'src/config/passport/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGauard } from 'src/gaurds/jwt.gaurd';
+import { RoleModule } from './role.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, UserDetails]), UserModule, JwtModule.register({}), PassportModule],
+  imports: [TypeOrmModule.forFeature([User, UserDetails]), UserModule, JwtModule.register({}), PassportModule, RoleModule],
   controllers: [AuthController],
   providers: [
     AuthService,

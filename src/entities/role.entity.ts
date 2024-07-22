@@ -1,5 +1,16 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { User } from './user.entity';
+import { Permission } from './permission.entity';
 
 @Entity('roles')
 export class Role {
@@ -25,4 +36,16 @@ export class Role {
   @OneToOne(() => User, { nullable: false })
   @JoinColumn({ name: 'last_modified_by' })
   modifiedBy: User;
+
+  @ManyToMany(() => Permission)
+  @JoinTable({
+    name: 'roles_permissions',
+    joinColumn: {
+      name: 'role_id',
+    },
+    inverseJoinColumn: {
+      name: 'permission_id',
+    },
+  })
+  permissions: Permission[];
 }

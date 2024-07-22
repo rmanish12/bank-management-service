@@ -1,4 +1,12 @@
-import { BadRequestException, ConflictException, Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from 'src/dtos/create-user.dto';
@@ -12,6 +20,9 @@ import { LoginUserDto } from 'src/dtos/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Cache } from 'cache-manager';
 import { ChangePasswordDto } from 'src/dtos/change-password.dto';
+import { RoleService } from './role.service';
+import { UpdateUserDto } from 'src/dtos/update-user-dto';
+import { MapperUtils } from 'src/utils/mapper';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +37,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     @Inject('CACHE_MANAGER') private cacheManager: Cache,
+    private roleService: RoleService,
   ) {
     this.encryptionUtil = new EncryptionUtil(this.configService);
   }
@@ -60,7 +72,7 @@ export class AuthService {
     });
   }
 
-  validateUser(loginUserDto: LoginUserDto, user: User) {
+  private validateUser(loginUserDto: LoginUserDto, user: User) {
     const { password } = loginUserDto;
     const { password: userPassword, isActive } = user;
 
@@ -136,5 +148,27 @@ export class AuthService {
 
     this.logger.log(`Password for user with id ${user.id} has been changed successfully`);
     return result;
+  }
+
+  async updateUser(currentUser: User, userId: string, updateUserDto: UpdateUserDto) {
+    this.logger.log(`Received request to update user with id: ${userId} by user with id: ${currentUser.id}`);
+
+    const userToUpdate = await this.getUserById(userId);
+
+    if (isEmpty(userToUpdate)) {
+      this.logger.error(`User with id: ${userId} not found`);
+      throw new NotFoundException(`User with id: ${userId} not found`);
+    }
+
+    const { isActive, roles } = updateUserDto;
+
+    const rolesInfo = await this.roleService.getRoleListByIds(roles);
+
+    userToUpdate.isActive = isActive;
+    userToUpdate.roles = rolesInfo;
+
+    await this.userRepo.save(userToUpdate);
+
+    this.logger.log(`User with id: ${userId} updated`);
   }
 }

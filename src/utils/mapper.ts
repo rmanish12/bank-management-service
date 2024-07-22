@@ -9,4 +9,14 @@ export class MapperUtils {
       name: `${firstName} ${lastName}`,
     };
   }
+
+  mapUserDetailsForPermissions(userDetails: UserDetails) {
+    const permissions = userDetails.user.roles
+      .map((role) => {
+        return role.permissions.map((permission) => permission.name);
+      })
+      .flat();
+
+    return [...new Set(permissions)];
+  }
 }

@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Get, Patch, Post, UseInterceptors } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Get, Param, Patch, Post, UseInterceptors } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/public.decorator';
 import { User } from 'src/decorators/user.decorator';
@@ -38,5 +38,12 @@ export class AuthController {
     await this.authService.updatePassword(user, changePasswordDto);
 
     return getSuccessResponse('Password has been updated successfully');
+  }
+
+  @Patch('/user/:userId')
+  async updateUser(@Param('userId') userId: string, @User() currentUser, @Body() updateUserDto) {
+    await this.authService.updateUser(currentUser, userId, updateUserDto);
+
+    return getSuccessResponse('User has been updated successfully');
   }
 }

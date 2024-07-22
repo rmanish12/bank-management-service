@@ -5,9 +5,10 @@ import { AuthModule } from './auth.module';
 import { UserModule } from './user.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { RoleModule } from './role.module';
 import { PermissionModule } from './permission.module';
+import { PermissionGaurd } from 'src/gaurds/permission.gaurd';
 
 @Module({
   imports: [
@@ -33,6 +34,10 @@ import { PermissionModule } from './permission.module';
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
     },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: PermissionGaurd,
+    // },
   ],
 })
 export class AppModule {}
