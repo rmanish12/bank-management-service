@@ -105,7 +105,7 @@ export class AccountTypeService {
     this.logger.log(`Received request for updating account type ${accountTypeId}`);
 
     const [accountTypeDetails, count] = await this.accountTypeRepo.findAndCountBy({ id: accountTypeId });
-    this.logger.debug(`count: ${count}`);
+
     if (isEmpty(accountTypeDetails)) {
       throw new NotFoundException('Account type not found');
     }
@@ -126,5 +126,15 @@ export class AccountTypeService {
     await this.accountTypeRepo.save(updatedAccountTypeDetails);
 
     this.logger.log(`Account type ${accountTypeId} updated`);
+  }
+
+  async getAccountTypeDetailsById(accountTypeId: string): Promise<AccountType> {
+    const details = await this.accountTypeRepo.findOneBy({ id: accountTypeId });
+
+    if (isEmpty(details)) {
+      throw new NotFoundException(`Account type ${accountTypeId} not found`);
+    }
+
+    return details;
   }
 }

@@ -9,5 +9,6 @@ import { UserModule } from './user.module';
   imports: [TypeOrmModule.forFeature([AccountType]), UserModule],
   controllers: [AccountTypeController],
   providers: [AccountTypeService],
+  exports: [AccountTypeService],
 })
 export class AccountTypeModule {}
