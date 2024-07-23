@@ -10,6 +10,7 @@ import { RoleModule } from './role.module';
 import { PermissionModule } from './permission.module';
 import { AccountTypeModule } from './account-type.module';
 import { UserAccountModule } from './user-account.module';
+import { GeneralAccountModule } from './general-account.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { UserAccountModule } from './user-account.module';
     PermissionModule,
     AccountTypeModule,
     UserAccountModule,
+    GeneralAccountModule,
   ],
   controllers: [],
   providers: [

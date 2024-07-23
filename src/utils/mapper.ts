@@ -4,6 +4,8 @@ import { UserDetails } from 'src/entities/user-details.entity';
 import { DATE_FORMAT } from './constants';
 import { isEmpty } from 'lodash';
 import { UserAccountDetails } from 'src/dtos/response/user-account-details-response.dto';
+import { GeneralAccount } from 'src/entities/general-account.entity';
+import { GeneralAccountDetailsResponse } from 'src/dtos/response/general-account-details.response.dto';
 
 export class MapperUtils {
   mapUserDetailsForResponse(userDetails: UserDetails) {
@@ -40,5 +42,19 @@ export class MapperUtils {
     });
 
     return result;
+  }
+
+  mapGeneralAccountDetailsForResponse(generalAccountDetails: GeneralAccount[]): GeneralAccountDetailsResponse[] {
+    return generalAccountDetails.map((generalAccount) => {
+      const { account, ...rest } = generalAccount;
+      return {
+        ...rest,
+        userAccountId: account.id,
+        accountNumber: account.accountNumber,
+        createdAt: moment(account.createdAt).format(DATE_FORMAT),
+        closedAt: !isEmpty(account.closedAt) ? moment(account.closedAt).format(DATE_FORMAT) : '',
+        accountType: account.accountType.name,
+      };
+    });
   }
 }

@@ -4,9 +4,10 @@ import { UserAccount } from 'src/entities/user-account.entity';
 import { AccountTypeModule } from './account-type.module';
 import { UserAccountController } from 'src/controllers/user-account.controller';
 import { UserAccountService } from 'src/services/user-account.service';
+import { GeneralAccountModule } from './general-account.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserAccount]), AccountTypeModule],
+  imports: [TypeOrmModule.forFeature([UserAccount]), AccountTypeModule, GeneralAccountModule],
   controllers: [UserAccountController],
   providers: [UserAccountService],
 })

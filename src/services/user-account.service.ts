@@ -1,14 +1,15 @@
 import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
 import { CreateUserAccountDto } from 'src/dtos/request/create-user-account.dto';
 import { UserAccount } from 'src/entities/user-account.entity';
 import { User } from 'src/entities/user.entity';
-import { IsNull, Not, Repository } from 'typeorm';
+import { DataSource, IsNull, Repository } from 'typeorm';
 import { AccountTypeService } from './account-type.service';
 import { isEmpty } from 'lodash';
 import { MapperUtils } from 'src/utils/mapper';
 import { UserAccountDetails } from 'src/dtos/response/user-account-details-response.dto';
+import { GeneralAccountService } from './general-account.service';
 
 @Injectable()
 export class UserAccountService {
@@ -17,7 +18,9 @@ export class UserAccountService {
 
   constructor(
     @InjectRepository(UserAccount) private readonly userAccountRepo: Repository<UserAccount>,
+    @InjectDataSource() private readonly dataSource: DataSource,
     private readonly accountTypeService: AccountTypeService,
+    private readonly generalAccountService: GeneralAccountService,
   ) {}
 
   private async getAccountDetailsById(accountId: string): Promise<UserAccount> {
@@ -37,20 +40,28 @@ export class UserAccountService {
     return details;
   }
 
-  async createUserAccount(user: User, createUserAccountDto: CreateUserAccountDto) {
+  private async getUserAccountObj(user: User, createUserAccountDto: CreateUserAccountDto) {
     const { accountType } = createUserAccountDto;
     this.logger.log(`Received request for creating user account for user: ${user.id} and type:${accountType}`);
 
     const accountTypeDetails = await this.accountTypeService.getAccountTypeDetailsById(accountType);
 
-    const newAccount = this.userAccountRepo.create({
+    return this.userAccountRepo.create({
       accountType: accountTypeDetails,
       user,
     });
+  }
 
-    await this.userAccountRepo.save(newAccount);
+  async createUserAccount(user: User, createUserAccountDto: CreateUserAccountDto) {
+    return this.dataSource.transaction(async (manager) => {
+      const accountDetails = await this.getUserAccountObj(user, createUserAccountDto);
+      const newAccountDetails = await manager.save(accountDetails);
 
-    this.logger.log(`Created new account for user: ${user.id} and type: ${accountType}`);
+      const newGeneralAccount = this.generalAccountService.createAccount(newAccountDetails);
+      await manager.save(newGeneralAccount);
+
+      this.logger.log(`Created new account for user: ${user.id} and type: ${createUserAccountDto.accountType}`);
+    });
   }
 
   async getUserAccounts(user: User): Promise<UserAccountDetails[]> {
