@@ -5,4 +5,5 @@ export enum PERMISSIONS {
   MANAGE_ROLES = 'Manage Roles',
   VIEW_ACCOUNT_TYPES = 'View Account Type',
   MANAGE_ACCOUNT_TYPES = 'Manage Account Type',
+  MANAGE_ROI = 'Manage ROI',
 }

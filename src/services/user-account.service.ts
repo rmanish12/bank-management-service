@@ -10,6 +10,8 @@ import { isEmpty } from 'lodash';
 import { MapperUtils } from 'src/utils/mapper';
 import { UserAccountDetails } from 'src/dtos/response/user-account-details-response.dto';
 import { GeneralAccountService } from './general-account.service';
+import { CreateDepositAccountDto } from 'src/dtos/request/create-deposit-account.dto';
+import { DepositAccountService } from './deposit-account.service';
 
 @Injectable()
 export class UserAccountService {
@@ -21,6 +23,7 @@ export class UserAccountService {
     @InjectDataSource() private readonly dataSource: DataSource,
     private readonly accountTypeService: AccountTypeService,
     private readonly generalAccountService: GeneralAccountService,
+    private readonly depositAccountService: DepositAccountService,
   ) {}
 
   private async getAccountDetailsById(accountId: string): Promise<UserAccount> {
@@ -40,11 +43,10 @@ export class UserAccountService {
     return details;
   }
 
-  private async getUserAccountObj(user: User, createUserAccountDto: CreateUserAccountDto) {
-    const { accountType } = createUserAccountDto;
-    this.logger.log(`Received request for creating user account for user: ${user.id} and type:${accountType}`);
+  private async getUserAccountObj(user: User, accountTypeId: string) {
+    this.logger.log(`Received request for creating user account for user: ${user.id} and type:${accountTypeId}`);
 
-    const accountTypeDetails = await this.accountTypeService.getAccountTypeDetailsById(accountType);
+    const accountTypeDetails = await this.accountTypeService.getAccountTypeDetailsById(accountTypeId);
 
     return this.userAccountRepo.create({
       accountType: accountTypeDetails,
@@ -52,15 +54,28 @@ export class UserAccountService {
     });
   }
 
-  async createUserAccount(user: User, createUserAccountDto: CreateUserAccountDto) {
+  async createUserGeneralAccount(user: User, createUserAccountDto: CreateUserAccountDto) {
     return this.dataSource.transaction(async (manager) => {
-      const accountDetails = await this.getUserAccountObj(user, createUserAccountDto);
+      const accountDetails = await this.getUserAccountObj(user, createUserAccountDto.accountType);
       const newAccountDetails = await manager.save(accountDetails);
 
       const newGeneralAccount = this.generalAccountService.createAccount(newAccountDetails);
       await manager.save(newGeneralAccount);
 
-      this.logger.log(`Created new account for user: ${user.id} and type: ${createUserAccountDto.accountType}`);
+      this.logger.log(`Created new general account for user: ${user.id} and type: ${createUserAccountDto.accountType}`);
+    });
+  }
+
+  async createUserDepositAccount(user: User, createDepositAccountDto: CreateDepositAccountDto) {
+    return this.dataSource.transaction(async (manager) => {
+      const accountDetails = await this.getUserAccountObj(user, createDepositAccountDto.accountType);
+      const newAccountDetails = await manager.save(accountDetails);
+
+      const newDepositAccount = await this.depositAccountService.createDepositAccount(createDepositAccountDto, newAccountDetails);
+
+      await manager.save(newDepositAccount);
+
+      this.logger.log(`Created new general account for user: ${user.id} and type: ${createDepositAccountDto.accountType}`);
     });
   }
 

@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/decorators/user.decorator';
+import { CreateDepositAccountDto } from 'src/dtos/request/create-deposit-account.dto';
 import { CreateUserAccountDto } from 'src/dtos/request/create-user-account.dto';
 import { UserAccountService } from 'src/services/user-account.service';
 import { getSuccessResponse } from 'src/utils/success-response.helper';
@@ -10,9 +11,16 @@ import { getSuccessResponse } from 'src/utils/success-response.helper';
 export class UserAccountController {
   constructor(private readonly userAccountService: UserAccountService) {}
 
-  @Post()
+  @Post('/general')
   async createUserAccount(@User() user, @Body() createUserAccountDto: CreateUserAccountDto) {
-    await this.userAccountService.createUserAccount(user, createUserAccountDto);
+    await this.userAccountService.createUserGeneralAccount(user, createUserAccountDto);
+
+    return getSuccessResponse('Account successfully created');
+  }
+
+  @Post('/deposit')
+  async createUserDepostAccount(@User() user, @Body() createDepositAccountDto: CreateDepositAccountDto) {
+    await this.userAccountService.createUserDepositAccount(user, createDepositAccountDto);
 
     return getSuccessResponse('Account successfully created');
   }

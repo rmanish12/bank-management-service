@@ -11,6 +11,8 @@ import { PermissionModule } from './permission.module';
 import { AccountTypeModule } from './account-type.module';
 import { UserAccountModule } from './user-account.module';
 import { GeneralAccountModule } from './general-account.module';
+import { RateOfInterestModule } from './rate-of-interest.module';
+import { DepositAccountModule } from './deposit-account.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { GeneralAccountModule } from './general-account.module';
     AccountTypeModule,
     UserAccountModule,
     GeneralAccountModule,
+    RateOfInterestModule,
+    DepositAccountModule,
   ],
   controllers: [],
   providers: [
